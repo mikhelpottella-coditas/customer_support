@@ -22,8 +22,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> customExceptionHandler(CustomException ex) {
         logger.error("Custom exception occurred");
         ErrorResponse error = new ErrorResponse(ex.getStatusCode(),
-                ex.getMessage(), LocalDateTime.now(),
-                ex.getStackTrace()[0].getMethodName());
+                ex.getMessage(), LocalDateTime.now());
         return ResponseEntity.status(ex.getStatusCode()).body(error);
 
     }
@@ -41,8 +40,7 @@ public class GlobalExceptionHandler {
     ResponseEntity<ErrorResponse> runtimeExceptionHandler(RuntimeException ex) {
         logger.error("Runtime exception occurred: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.getMessage(), LocalDateTime.now(),
-                ex.getStackTrace()[0].getMethodName());
+                ex.getMessage(), LocalDateTime.now());
 
         return ResponseEntity.status(errorResponse.getStatusCode()).body(errorResponse);
     }
