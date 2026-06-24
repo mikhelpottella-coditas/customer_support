@@ -4,6 +4,8 @@ import com.example.customersupport.enums.SupportType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -34,5 +36,9 @@ public class Agent {
     @ManyToOne
     @JoinColumn(name = "manger_id",nullable = false)
     private Manager manager;
+
+    //mapping
+    @OneToMany(mappedBy = "agent")
+    private List<Complaint> complaintList;
 
 }

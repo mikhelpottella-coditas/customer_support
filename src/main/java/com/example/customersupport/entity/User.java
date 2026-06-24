@@ -65,4 +65,6 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user")
     private Agent agent;
 
+    @OneToOne(mappedBy = "user")
+    private Customer customer;
 }
