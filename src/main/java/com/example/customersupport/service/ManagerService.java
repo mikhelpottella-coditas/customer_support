@@ -8,12 +8,14 @@ import com.example.customersupport.enums.Roles;
 import com.example.customersupport.repo.ManagerRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ManagerService {
 
 
@@ -26,6 +28,7 @@ public class ManagerService {
                 .firstName(userSeedingRequestDto.firstName())
                 .lastName(userSeedingRequestDto.lastName())
                 .email(userSeedingRequestDto.email())
+                .phoneNumber(userSeedingRequestDto.phone())
                 .password(userSeedingRequestDto.password())
                 .isDeleted(false)
                 .role(Roles.MANAGER)
@@ -37,7 +40,7 @@ public class ManagerService {
 
         managerRepo.save(manager);
 
-
+        log.info("new manager is seeded in to the application");
         return new GenericResponse(HttpStatus.CREATED,"new manager is seeded successfully");
 
 
