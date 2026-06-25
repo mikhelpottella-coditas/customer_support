@@ -23,10 +23,7 @@ public class ManagerController {
 
 
 
-    @GetMapping("/complaints/{id}")
-    public ResponseEntity<ComplaintResponseDto> getComplaintById(@PathVariable Long id){
-        return ResponseEntity.ok(complaintService.getComplaintById(id));
-    }
+
 
 
     @GetMapping("/agents")

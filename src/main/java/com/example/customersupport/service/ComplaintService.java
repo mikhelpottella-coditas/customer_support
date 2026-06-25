@@ -1,12 +1,10 @@
 package com.example.customersupport.service;
 
+import com.example.customersupport.dto.request.AttachmentRequestDto;
 import com.example.customersupport.dto.request.ComplaintRequestDto;
 import com.example.customersupport.dto.response.ComplaintResponseDto;
 import com.example.customersupport.dto.response.GenericResponse;
-import com.example.customersupport.entity.Attachment;
-import com.example.customersupport.entity.Complaint;
-import com.example.customersupport.entity.Customer;
-import com.example.customersupport.entity.User;
+import com.example.customersupport.entity.*;
 import com.example.customersupport.enums.ComplaintStatus;
 import com.example.customersupport.enums.Roles;
 import com.example.customersupport.exception.CustomException;
@@ -15,7 +13,6 @@ import com.example.customersupport.util.AuthorityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.internal.constraintvalidators.bv.number.bound.decimal.AbstractDecimalMinValidator;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -91,9 +88,20 @@ public class ComplaintService {
         return complaintRepo.findById(id).orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND,"the complaint is not found with the given id"));
     }
 
-    public ComplaintResponseDto getComplaintById(Long id) {
 
-        Complaint complaint = getById(id);
+    public ComplaintResponseDto getComplaintById(Long id) {
+        User user = authorityUtil.checkUser();
+        Complaint  complaint = getById(id);
+
+        // checking the authority of the user
+        if(user.getRole().equals(Roles.AGENT) && user.getAgent()!=complaint.getAgent()){
+            throw new CustomException(HttpStatus.FORBIDDEN,"you dont have authority");
+        }
+        if(user.getRole().equals(Roles.CUSTOMER) && user.getCustomer()!=complaint.getCustomer()){
+            throw new CustomException(HttpStatus.FORBIDDEN,"you dont have authority");
+        }
+
+
         List<Long> attachmentList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList().stream().map(i -> i.getId()).toList();
         log.info("returning the complaint by the id : {}",id);
         return new ComplaintResponseDto(complaint.getId(),complaint.getComplaintStatus() ,complaint.getCategory().getIssue(),complaint.getDescription(),complaint.getAgent().getId(),complaint.getCustomer().getId(),attachmentList);
@@ -126,4 +134,45 @@ public class ComplaintService {
         }
         return new GenericResponse(HttpStatus.CREATED,"new complaint is raised successfully!!");
     }
+
+    public GenericResponse addAttachment(Long id, @Valid AttachmentRequestDto attachmentRequestDto) {
+
+        User user = authorityUtil.checkUser();
+
+        try {
+            Complaint complaint = complaintRepo.findById(id).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "complaint not found with the given id"));
+            if (!user.getCustomer().equals(complaint.getCustomer()))
+                throw new CustomException(HttpStatus.FORBIDDEN, "you are not allowed to access");
+            Attachment attachment = Attachment.builder()
+                    .referenceText(attachmentRequestDto.referenceText())
+                    .file(attachmentRequestDto.file())
+                    .build();
+            //adding the attachment to the complaint
+            complaint.addAttachment(attachment);
+            complaintRepo.save(complaint);
+        } catch (Exception e) {
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"server is slow please wait");
+        }
+        log.info("the attachment is added to the complaint ");
+        return new GenericResponse(HttpStatus.CREATED,"attachment is added to the complaint!!");
+
+    }
+
+    public GenericResponse sendMessage(Long id, String message) {
+
+        User user = authorityUtil.checkUser();
+        try {
+            Complaint complaint = complaintRepo.findById(id).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "complaint not found with the given id"));
+            if (!user.getCustomer().equals(complaint.getCustomer()))
+                throw new CustomException(HttpStatus.FORBIDDEN, "you are not allowed to access");
+
+            Chatting chatting = Chatting.builder()
+                    .senderId(user.getId())
+                    .message(message)
+                    .SenderName(user.getFirstName())
+                    .build()
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 }
