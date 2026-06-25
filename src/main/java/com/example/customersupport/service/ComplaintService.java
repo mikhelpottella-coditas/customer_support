@@ -74,7 +74,8 @@ public class ComplaintService {
 
             complaintList.forEach(complaint -> {
 
-                List<Long> attachemtList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList().stream().map(i -> i.getId()).toList();
+                List<Long> attachemtList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList()
+                        .stream().map(i -> i.getId()).toList();
 
                 complaintResponseDtoList.add(ComplaintResponseDto.builder()
                         .id(complaint.getId())
