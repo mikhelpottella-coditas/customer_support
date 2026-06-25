@@ -17,10 +17,10 @@ public class AuthorityUtil {
 
     private final UserService userService;
 
-    public void checkUser(){
+    public User checkUser(){
         User user = userService.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         log.info("checking if the user is a manager or not");
-        if(user.getRole()!= Roles.MANAGER) throw new CustomException(HttpStatus.FORBIDDEN,"you are not allowed to access");
+        return user;
     }
 
 }

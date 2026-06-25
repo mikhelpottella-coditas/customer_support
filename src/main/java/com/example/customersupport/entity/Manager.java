@@ -26,9 +26,7 @@ public class Manager {
     private Double experience;
 
 
-    // mappings
-    @OneToMany(mappedBy = "manager")
-    private List<Agent> agent;
+
 
 
 }

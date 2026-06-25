@@ -6,6 +6,8 @@ import com.example.customersupport.enums.Priority;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -47,10 +49,21 @@ public class Complaint {
     private Agent agent;
 
 
+    @Column(name = "created_at",nullable = false)
+    private LocalDateTime createdAt;
+
     //mapping
-    @OneToMany(mappedBy = "complaint")
+    @OneToMany(mappedBy = "complaint",cascade = CascadeType.ALL)
     private List<Attachment> attachmentList;
 
     @OneToMany(mappedBy = "complaint")
     private List<Chatting> chattingList;
+
+
+    public void addAttachment(Attachment attachment){
+        if(attachmentList==null) attachmentList = new ArrayList<>();
+        attachment.setComplaint(this);
+        attachmentList.add(attachment);
+    }
+
 }

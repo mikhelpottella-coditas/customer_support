@@ -3,13 +3,15 @@ package com.example.customersupport.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.NumberFormat;
 
-public record UserSeedingRequestDto (
+public record AgentRequestDto (
 
         @NotBlank(message = "please provide the first name")
         String firstName,
+
         String lastName,
 
         @NotBlank(message = "please provide the email")
@@ -23,7 +25,11 @@ public record UserSeedingRequestDto (
         @NotBlank(message = "please provide the phone number")
         @NumberFormat(style = NumberFormat.Style.NUMBER)
         @Size(min = 10,max = 10)
-        String phone
+        String phone,
+
+        @NotNull(message = "please your experience")
+        Double experience
+
 
 ){
 }
