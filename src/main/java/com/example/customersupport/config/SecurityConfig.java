@@ -1,6 +1,7 @@
 package com.example.customersupport.config;
 
 
+import com.example.customersupport.enums.Roles;
 import com.example.customersupport.filter.JwtFilter;
 import com.example.customersupport.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/v1/auth/**").permitAll()
                                 .requestMatchers(PUBLIC_URLS).permitAll()
-                                .anyRequest().permitAll())
+                                .requestMatchers("/v1/manager/**").hasRole(Roles.MANAGER.name())
+                                .requestMatchers("/v1/agent/**").hasAnyRole(Roles.AGENT.name(),Roles.MANAGER.name())
+                                .requestMatchers("/v1/customer/**").hasAnyRole(Roles.CUSTOMER.name())
+                                .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .userDetailsService(userService);

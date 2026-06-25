@@ -17,12 +17,12 @@ public record UserRequestDto (
         String email,
 
         @NotBlank(message = "please provide the password")
-        @Size(min = 6,max = 200,message = "please provide the password in the given range")
+        @Size(min = 6, max = 200, message = "please provide the password in the given range")
         String password,
 
         @NotBlank(message = "please provide the phone number")
         @NumberFormat(style = NumberFormat.Style.NUMBER)
-        @Size(min = 10,max = 10)
+        @Size(min = 10, max = 10)
         String phone
 
 ){

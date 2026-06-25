@@ -2,9 +2,10 @@ package com.example.customersupport.dto.response;
 
 
 import com.example.customersupport.enums.ComplaintStatus;
+import lombok.Builder;
 
 import java.util.List;
-
+@Builder
 public record ComplaintResponseDto(
 
         Long id,
@@ -19,7 +20,7 @@ public record ComplaintResponseDto(
 
         Long CustomerId,
 
-        List<Long> imageId
+        List<Long> attachmentList
 
 ) {
 }

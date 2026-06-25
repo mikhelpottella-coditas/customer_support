@@ -20,11 +20,6 @@ public class Category {
 
     @Column(name = "issue",nullable = false)
     private String issue;
-
-    @Column(name = "description")
-    private String description;
-
-
     // mapping
 
     @OneToMany(mappedBy = "category")
