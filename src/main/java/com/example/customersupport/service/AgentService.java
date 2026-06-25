@@ -57,6 +57,7 @@ public class AgentService {
                         .rating(agent.getRating())
                         .phone(user.getPhoneNumber())
                         .supportType(agent.getSupportType())
+                        .deleted(user.isDeleted())
                         .build());
             });
         } catch (Exception e) {
@@ -86,35 +87,39 @@ public class AgentService {
                 .rating(agent.getRating())
                 .phone(user.getPhoneNumber())
                 .supportType(agent.getSupportType())
+                .deleted(user.isDeleted())
                 .build();
     }
 
     public GenericResponse assignComplaint(Long agentId, Long complaintId) {
         Agent agent = getById(agentId);
+        if(agent.getUser().isDeleted()) throw new CustomException(HttpStatus.BAD_REQUEST,"user is deleted");
         Complaint complaint = complaintService.getById(complaintId);
 
-        if(complaint.getAgent()!=null) throw new CustomException(HttpStatus.BAD_REQUEST,"the agent is already assigned. if you want please try reassigning");
+        if (complaint.getAgent() != null)
+            throw new CustomException(HttpStatus.BAD_REQUEST, "the agent is already assigned. if you want please try reassigning");
         try {
             complaint.setAgent(agent);
             complaintService.saveCompliant(complaint);
         } catch (RuntimeException e) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"something went wrong!!");
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong!!");
         }
-        log.info("the assignment of agent with  id : {} to compliant id: {} is done",agentId,complaintId);
-        return new GenericResponse(HttpStatus.OK,"assignment successful");
+        log.info("the assignment of agent with  id : {} to compliant id: {} is done", agentId, complaintId);
+        return new GenericResponse(HttpStatus.OK, "assignment successful");
     }
 
     public GenericResponse reassignComplaint(Long agentId, Long complaintId) {
         Agent agent = getById(agentId);
+        if(agent.getUser().isDeleted()) throw new CustomException(HttpStatus.BAD_REQUEST,"user is deleted");
         Complaint complaint = complaintService.getById(complaintId);
 
         try {
             complaint.setAgent(agent);
             complaintService.saveCompliant(complaint);
         } catch (RuntimeException e) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,"something went wrong!!");
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong!!");
         }
-        log.info("the assignment of agent with  id : {} to compliant id: {} is done",agentId,complaintId);
-        return new GenericResponse(HttpStatus.OK,"assignment successful");
+        log.info("the assignment of agent with  id : {} to compliant id: {} is done", agentId, complaintId);
+        return new GenericResponse(HttpStatus.OK, "assignment successful");
     }
 }

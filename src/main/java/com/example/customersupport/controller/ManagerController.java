@@ -8,13 +8,17 @@ import com.example.customersupport.enums.ComplaintStatus;
 import com.example.customersupport.enums.Priority;
 import com.example.customersupport.enums.SupportType;
 import com.example.customersupport.service.AgentService;
+import com.example.customersupport.service.CategoryService;
 import com.example.customersupport.service.ComplaintService;
 import com.example.customersupport.service.InviteService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.NumberFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
@@ -31,6 +35,7 @@ public class ManagerController {
     private final ComplaintService complaintService;
     private final AgentService agentService;
     private final InviteService inviteService;
+    private final CategoryService categoryService;
 
 
     @GetMapping("/agents")
@@ -45,6 +50,7 @@ public class ManagerController {
         return ResponseEntity.ok(agentService.getAllAgents(page, size, sortBy, ascending, search, filter));
     }
 
+    @Operation(summary = "updating the priority of the complaint")
     @PatchMapping("/complaints/{id}")
     public ResponseEntity<GenericResponse> setPriority(@NotNull @PathVariable Long id,@NotNull @RequestParam Priority priority){
         return ResponseEntity.ok(complaintService.setPriority(id,priority));
@@ -78,5 +84,9 @@ public class ManagerController {
         return ResponseEntity.ok(inviteService.invite(inviteRequestDto));
     }
 
+    @PostMapping("/add-category")
+    public ResponseEntity<GenericResponse> addCategory(@NotBlank @RequestParam String issue){
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.addCategory(issue));
+    }
 
 }

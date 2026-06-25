@@ -1,19 +1,23 @@
 package com.example.customersupport.controller;
 
 import com.example.customersupport.dto.request.AgentRequestDto;
+import com.example.customersupport.dto.request.LoginRequestDto;
 import com.example.customersupport.dto.request.UserRequestDto;
 import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.service.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("/v1/auth/")
 @RequiredArgsConstructor
+@Validated
 public class AuthController {
 
     private final ManagerService managerService;
@@ -39,11 +43,24 @@ public class AuthController {
 
 
     @GetMapping("/refresh/{token}")
-    public ResponseEntity<String> getAccessToken(@PathVariable String token){
+    public ResponseEntity<GenericResponse> getAccessToken(@NotBlank @PathVariable String token){
         return ResponseEntity.ok(refreshTokenService.refresh(token));
-    }}
+    }
 
-//    @PostMapping("/login")
+    @PostMapping("/login")
+    public ResponseEntity<GenericResponse> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
+        return ResponseEntity.ok(authService.login(loginRequestDto));
+    }
 
 
-//Request}
+    @DeleteMapping("/logout")
+    public ResponseEntity<GenericResponse> logout(){
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(authService.logout());
+    }
+
+    @PatchMapping("/signout")
+    public ResponseEntity<GenericResponse> signOut(){
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(authService.signOut());
+    }
+
+}

@@ -38,7 +38,7 @@ public class ComplaintService {
     private final CustomerService customerService;
 
 
-    public List<ComplaintResponseDto> getAllComplaints(int page, int size, String sortBy, boolean ascending, String search, ComplaintStatus filter) {
+    public List<ComplaintResponseDto>   getAllComplaints(int page, int size, String sortBy, boolean ascending, String search, ComplaintStatus filter) {
         // to check the user authority
 
         User user = authorityUtil.checkUser();
@@ -77,18 +77,20 @@ public class ComplaintService {
                 List<Long> attachemtList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList()
                         .stream().map(i -> i.getId()).toList();
 
+                Long agentId = complaint.getAgent()==null?null:complaint.getAgent().getId();
+
                 complaintResponseDtoList.add(ComplaintResponseDto.builder()
                         .id(complaint.getId())
                         .complaintStatus(complaint.getComplaintStatus())
                         .category(complaint.getCategory().getIssue())
                         .description(complaint.getDescription())
                         .CustomerId(complaint.getCustomer().getId())
-                        .agentId(complaint.getAgent().getId())
+                        .agentId(agentId)
                         .attachmentList(attachemtList)
                         .build());
             });
         } catch (Exception e) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong");
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
         log.info("if the search is empty then return the whole list");
         if (search.isBlank()) return complaintResponseDtoList;
@@ -109,6 +111,7 @@ public class ComplaintService {
         try {
             complaint = getById(id);
         } catch (Exception e) {
+            log.info("error : ",e);
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong");
         }
 
@@ -122,19 +125,29 @@ public class ComplaintService {
 
 
         List<Long> attachmentList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList().stream().map(i -> i.getId()).toList();
+        Long agentId = complaint.getAgent()==null?null:complaint.getAgent().getId();
+
         log.info("returning the complaint by the id : {}", id);
-        return new ComplaintResponseDto(complaint.getId(), complaint.getComplaintStatus(), complaint.getCategory().getIssue(), complaint.getDescription(), complaint.getAgent().getId(), complaint.getCustomer().getId(), attachmentList);
+        return new ComplaintResponseDto(complaint.getId(),
+                complaint.getComplaintStatus(),
+                complaint.getCategory().getIssue(),
+                complaint.getDescription(),
+                agentId,
+                complaint.getCustomer().getId(),
+                attachmentList);
     }
 
     public GenericResponse registerComplaint(ComplaintRequestDto complaintRequestDto) {
         User user = authorityUtil.checkUser();
         Customer customer = customerService.findCustomerByUser(user);
 
+        Category category = categoryService.getById(complaintRequestDto.category());
+
         Complaint complaint = Complaint.builder()
                 .complaintStatus(ComplaintStatus.RAISED)
                 .description(complaintRequestDto.description())
                 .customer(customer)
-                .category(complaintRequestDto.category())
+                .category(category)
                 .priority(Priority.MEDIUM)
                 .createdAt(LocalDateTime.now())
                 .build();

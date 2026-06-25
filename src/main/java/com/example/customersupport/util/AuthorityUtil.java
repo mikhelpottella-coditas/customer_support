@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -18,9 +20,13 @@ public class AuthorityUtil {
     private final UserService userService;
 
     public User checkUser(){
-        User user = userService.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-        log.info("checking if the user is a manager or not");
-        return user;
+        try {
+            User user = userService.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+            log.info("checking if the user is a manager or not");
+            return user;
+        } catch (RuntimeException e) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED,"please login to access the application");
+        }
     }
 
 }

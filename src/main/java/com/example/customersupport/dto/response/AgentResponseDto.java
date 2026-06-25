@@ -21,7 +21,9 @@ public record AgentResponseDto(
 
         Double rating,
 
-        SupportType supportType
+        SupportType supportType,
+
+        boolean deleted
 
 
 ) {

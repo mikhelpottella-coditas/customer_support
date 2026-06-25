@@ -25,6 +25,8 @@ public class UserCurdService {
 
     public ProfileResponseDto getProfile() {
         User user = authorityUtil.checkUser();
+        if(user==null) throw new CustomException(HttpStatus.UNAUTHORIZED,"please login to access the application");
+
         ProfileResponseDto profileResponseDto = ProfileResponseDto.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())

@@ -7,10 +7,10 @@ public record LoginRequestDto (
 
         @NotBlank(message = "email is not provided")
         @Email(message = "please provide a proper email")
-        String email
-//
-//        @
-//        String password
-//
+        String email,
+
+        @NotBlank(message = "please provide the password")
+        String password
+
 ){
 }

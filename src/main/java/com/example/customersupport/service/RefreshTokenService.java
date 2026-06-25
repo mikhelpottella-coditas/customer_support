@@ -1,6 +1,7 @@
 package com.example.customersupport.service;
 
 
+import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.entity.RefreshToken;
 import com.example.customersupport.entity.User;
 import com.example.customersupport.exception.CustomException;
@@ -36,7 +37,7 @@ public class RefreshTokenService {
         return token.getToken();
     }
 
-    public String refresh(String refreshToken) {
+    public GenericResponse refresh(String refreshToken) {
 
         RefreshToken token = refreshTokenRepository.findById(refreshToken)
                 .orElseThrow(()-> new CustomException(HttpStatus.BAD_REQUEST,"Invalid Token"));
@@ -48,7 +49,7 @@ public class RefreshTokenService {
         }
         String newAccess = jwtUtil.generateToken(user.getEmail());
         log.info("refreshing the token with the id : {}",newAccess);
-        return "access token: "+newAccess;
+        return new GenericResponse( HttpStatus.OK,"access token: "+newAccess);
     }
 
     public List<RefreshToken> getToken(User user) {

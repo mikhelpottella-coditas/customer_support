@@ -11,10 +11,7 @@ import java.util.List;
 
 public record ComplaintRequestDto(
 
-        Category category,
-
-        Priority priority,
-
+        Long category,
 
         String description,
 
