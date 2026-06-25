@@ -5,6 +5,7 @@ import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.service.ManagerService;
 import com.example.customersupport.service.UserCurdService;
 import com.example.customersupport.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,11 @@ public class AuthController {
     private final ManagerService managerService;
 
     @PostMapping("/register")
-    public ResponseEntity<GenericResponse> registerUser(@RequestBody UserSeedingRequestDto userSeedingRequestDto) {
+    public ResponseEntity<GenericResponse> registerUser(@Valid @RequestBody UserSeedingRequestDto userSeedingRequestDto) {
         GenericResponse genericResponse = managerService.registerManger(userSeedingRequestDto);
         return new ResponseEntity<>(genericResponse, HttpStatus.CREATED);
     }
+
+
 
 }

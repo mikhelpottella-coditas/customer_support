@@ -9,8 +9,8 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "image")
-public class Image {
+@Table(name = "attachments")
+public class Attachment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +22,9 @@ public class Image {
     private Complaint complaint;
 
 
-    @Lob
-    @Column(columnDefinition = "IMAGEBLOB", nullable = false)
-    private String imageHolder;
+
+    @Column(name="file", nullable = false)
+    private String file;
 
 
     @Column(name = "reference_text")

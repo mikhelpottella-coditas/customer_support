@@ -2,6 +2,7 @@ package com.example.customersupport.entity;
 
 
 import com.example.customersupport.enums.ComplaintStatus;
+import com.example.customersupport.enums.Priority;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,10 @@ public class Complaint {
     @JoinColumn(name = "category_id",nullable = false)
     private Category category;
 
+    @Column(name="priority")
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
+
 
     @Column(name = "description")
     private String description;
@@ -44,5 +49,8 @@ public class Complaint {
 
     //mapping
     @OneToMany(mappedBy = "complaint")
-    private List<Image> imageList;
+    private List<Attachment> attachmentList;
+
+    @OneToMany(mappedBy = "complaint")
+    private List<Chatting> chattingList;
 }
