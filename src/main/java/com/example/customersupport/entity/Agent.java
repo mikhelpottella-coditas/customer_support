@@ -23,9 +23,6 @@ public class Agent {
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @Column(name = "experience",nullable = false)
-    private Double experience;
-
     @Column(name = "rating")
     private Double rating;
 

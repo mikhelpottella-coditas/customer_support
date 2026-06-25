@@ -22,21 +22,20 @@ public class CustomerController {
 
     private final ComplaintService complaintService;
 
-    // post complaint
+
 
     @PostMapping("/complaints")
     public ResponseEntity<GenericResponse> registerComplaint(@Valid @RequestBody ComplaintRequestDto complaintRequestDto){
         return  ResponseEntity.status(HttpStatus.CREATED).body(complaintService.registerComplaint(complaintRequestDto));
     }
 
-    // get all the complaints
 
 
     @PostMapping("/{id}/attachment")
     public ResponseEntity<GenericResponse> addAttachment(@PathVariable Long id,@Valid @RequestBody AttachmentRequestDto attachmentRequestDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(complaintService.addAttachment(id,attachmentRequestDto));
     }
-    // get the complaint by id
+
 
 
     @PostMapping("/{id}/ratings")
@@ -44,12 +43,6 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(complaintService.giveRating(id,ratingRequestDto));
     }
 
-    // post attachment to the complaint
 
-    // post message to the complaint
-
-    // see the messages in the complaint
-
-    // post the rating
 
 }

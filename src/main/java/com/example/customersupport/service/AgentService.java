@@ -34,10 +34,7 @@ import java.util.UUID;
 @Slf4j
 public class AgentService {
 
-    private final AuthorityUtil authorityUtil;
     private final AgentRepo agentRepo;
-    private final InviteService inviteService;
-    private final ComplaintRepo complaintRepo;
     private final ComplaintService complaintService;
 
 
@@ -60,7 +57,6 @@ public class AgentService {
                         .rating(agent.getRating())
                         .phone(user.getPhoneNumber())
                         .supportType(agent.getSupportType())
-                        .experience(agent.getExperience())
                         .build());
             });
         } catch (Exception e) {
@@ -90,7 +86,6 @@ public class AgentService {
                 .rating(agent.getRating())
                 .phone(user.getPhoneNumber())
                 .supportType(agent.getSupportType())
-                .experience(agent.getExperience())
                 .build();
     }
 

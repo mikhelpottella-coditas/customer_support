@@ -1,5 +1,6 @@
 package com.example.customersupport.controller;
 
+import com.example.customersupport.dto.request.InviteRequestDto;
 import com.example.customersupport.dto.response.AgentResponseDto;
 import com.example.customersupport.dto.response.ComplaintResponseDto;
 import com.example.customersupport.dto.response.GenericResponse;
@@ -8,6 +9,7 @@ import com.example.customersupport.enums.Priority;
 import com.example.customersupport.enums.SupportType;
 import com.example.customersupport.service.AgentService;
 import com.example.customersupport.service.ComplaintService;
+import com.example.customersupport.service.InviteService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,7 @@ public class ManagerController {
 
     private final ComplaintService complaintService;
     private final AgentService agentService;
-    private final Validator validator;
+    private final InviteService inviteService;
 
 
     @GetMapping("/agents")
@@ -68,6 +70,12 @@ public class ManagerController {
             @NotNull @RequestParam Long complaintId
     ) {
         return ResponseEntity.ok(agentService.reassignComplaint(agentId,complaintId));
+    }
+
+
+    @PostMapping("/invite-agent")
+    public ResponseEntity<GenericResponse> sendInvite(@Valid @RequestBody InviteRequestDto inviteRequestDto){
+        return ResponseEntity.ok(inviteService.invite(inviteRequestDto));
     }
 
 

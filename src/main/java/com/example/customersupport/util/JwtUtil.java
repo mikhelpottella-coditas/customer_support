@@ -18,10 +18,9 @@ public class JwtUtil {
     private final byte[] secret = "asdfghjklqwertyuiop123456789asdfghjklzxcvbnm".getBytes();
 
 
-    public String generateToken(String username,String email){
+    public String generateToken(String username){
 
         Map<String,String> claims = new HashMap<>();
-        claims.put("email",email);
         claims.put("username",username);
 
 
@@ -31,7 +30,6 @@ public class JwtUtil {
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis()+(1000*60*30)))
                 .and()
-                .claim("email",email)
                 .signWith(Keys.hmacShaKeyFor(secret),Jwts.SIG.HS256)
                 .compact();
     }

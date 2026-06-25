@@ -22,11 +22,4 @@ public class Manager {
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
-    @Column(name = "experience")
-    private Double experience;
-
-
-
-
-
 }
