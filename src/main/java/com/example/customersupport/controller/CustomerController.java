@@ -1,6 +1,8 @@
 package com.example.customersupport.controller;
 
+import com.example.customersupport.dto.request.AttachmentRequestDto;
 import com.example.customersupport.dto.request.ComplaintRequestDto;
+import com.example.customersupport.dto.request.RatingRequestDto;
 import com.example.customersupport.dto.response.ComplaintResponseDto;
 import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.service.ComplaintService;
@@ -30,10 +32,17 @@ public class CustomerController {
     // get all the complaints
 
 
-
+    @PostMapping("/{id}/attachment")
+    public ResponseEntity<GenericResponse> addAttachment(@PathVariable Long id,@Valid @RequestBody AttachmentRequestDto attachmentRequestDto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(complaintService.addAttachment(id,attachmentRequestDto));
+    }
     // get the complaint by id
 
 
+    @PostMapping("/{id}/ratings")
+    public ResponseEntity<GenericResponse> giveRating(@PathVariable Long id, @Valid @RequestBody RatingRequestDto ratingRequestDto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(complaintService.giveRating(id,ratingRequestDto));
+    }
 
     // post attachment to the complaint
 

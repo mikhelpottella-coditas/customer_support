@@ -52,6 +52,9 @@ public class Complaint {
     @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "rating")
+    private Short rating;
+
     //mapping
     @OneToMany(mappedBy = "complaint",cascade = CascadeType.ALL)
     private List<Attachment> attachmentList;
@@ -64,6 +67,12 @@ public class Complaint {
         if(attachmentList==null) attachmentList = new ArrayList<>();
         attachment.setComplaint(this);
         attachmentList.add(attachment);
+    }
+
+    public void addChatting(Chatting chatting){
+        if(chattingList==null) chattingList = new ArrayList<>();
+        chatting.setComplaint(this);
+        chattingList.add(chatting);
     }
 
 }
