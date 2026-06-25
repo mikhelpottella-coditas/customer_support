@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -23,7 +25,7 @@ public class ManagerService {
 
 
     public GenericResponse registerManger(UserSeedingRequestDto userSeedingRequestDto) {
-
+        log.info("seeding the manager into application");
         User user = User.builder()
                 .firstName(userSeedingRequestDto.firstName())
                 .lastName(userSeedingRequestDto.lastName())
@@ -31,6 +33,7 @@ public class ManagerService {
                 .phoneNumber(userSeedingRequestDto.phone())
                 .password(userSeedingRequestDto.password())
                 .isDeleted(false)
+                .createdAt(LocalDateTime.now())
                 .role(Roles.MANAGER)
                 .build();
 

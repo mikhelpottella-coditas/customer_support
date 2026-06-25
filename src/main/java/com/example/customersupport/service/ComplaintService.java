@@ -8,6 +8,7 @@ import com.example.customersupport.enums.ComplaintStatus;
 import com.example.customersupport.enums.Roles;
 import com.example.customersupport.exception.CustomException;
 import com.example.customersupport.repo.ComplaintRepo;
+import com.example.customersupport.util.AuthorityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -29,9 +30,11 @@ public class ComplaintService {
     private final CategoryService categoryService;
     private final UserService userService;
 
+    private final AuthorityUtil authorityUtil;
 
     public List<ComplaintResponseDto> getAllComplaints(int page, int size, String sortBy, boolean ascending, String search, ComplaintStatus filter) {
-
+        // to check the user authority
+        authorityUtil.checkUser();
 
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
