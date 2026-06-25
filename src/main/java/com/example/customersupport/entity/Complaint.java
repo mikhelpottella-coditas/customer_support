@@ -48,7 +48,7 @@ public class Complaint {
 
 
     //mapping
-    @OneToMany(mappedBy = "complaint")
+    @OneToMany(mappedBy = "complaint",cascade = CascadeType.ALL)
     private List<Attachment> attachmentList;
 
     @OneToMany(mappedBy = "complaint")

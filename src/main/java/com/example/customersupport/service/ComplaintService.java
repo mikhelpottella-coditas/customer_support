@@ -30,11 +30,10 @@ public class ComplaintService {
     private final CategoryService categoryService;
     private final UserService userService;
 
-    private final AuthorityUtil authorityUtil;
 
     public List<ComplaintResponseDto> getAllComplaints(int page, int size, String sortBy, boolean ascending, String search, ComplaintStatus filter) {
         // to check the user authority
-        authorityUtil.checkUser();
+
 
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -51,12 +50,12 @@ public class ComplaintService {
 
         complaintList.forEach(complaint -> {
 
-            List<Long> imageList = complaint.getImageList() == null ? null : complaint.getImageList().stream().map(i -> i.getId()).toList();
+            List<Long> attachemtList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList().stream().map(i -> i.getId()).toList();
 
             complaintResponseDtoList.add(new ComplaintResponseDto(complaint.getId()
                     , complaint.getComplaintStatus(), complaint.getCategory().getIssue()
                     , complaint.getDescription(), complaint.getAgent().getId()
-                    , complaint.getCustomer().getId(), imageList));
+                    , complaint.getCustomer().getId(), attachemtList));
         });
 
         log.info("if the search is empty then return the whole list");
@@ -73,8 +72,8 @@ public class ComplaintService {
     public ComplaintResponseDto getComplaintById(Long id) {
 
         Complaint complaint = getById(id);
-        List<Long> imageList = complaint.getImageList() == null ? null : complaint.getImageList().stream().map(i -> i.getId()).toList();
+        List<Long> attachmentList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList().stream().map(i -> i.getId()).toList();
         log.info("returning the complaint by the id : {}",id);
-        return new ComplaintResponseDto(complaint.getId(),complaint.getComplaintStatus() ,complaint.getCategory().getIssue(),complaint.getDescription(),complaint.getAgent().getId(),complaint.getCustomer().getId(),imageList);
+        return new ComplaintResponseDto(complaint.getId(),complaint.getComplaintStatus() ,complaint.getCategory().getIssue(),complaint.getDescription(),complaint.getAgent().getId(),complaint.getCustomer().getId(),attachmentList);
     }
 }

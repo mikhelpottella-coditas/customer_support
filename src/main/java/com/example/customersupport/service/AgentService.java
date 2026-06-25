@@ -25,7 +25,7 @@ public class AgentService {
 
     public List<AgentResponseDto> getAllAgents(int page, int size, String sortBy, boolean ascending, String search, SupportType filter) {
         // checking the authority of the user
-        authorityUtil.checkUser();
+
 
 
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();

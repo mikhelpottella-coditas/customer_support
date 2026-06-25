@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.NumberFormat;
 
-public record UserSeedingRequestDto (
+public record UserRequestDto (
 
         @NotBlank(message = "please provide the first name")
         String firstName,
