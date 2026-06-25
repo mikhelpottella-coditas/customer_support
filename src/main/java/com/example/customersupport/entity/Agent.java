@@ -33,9 +33,6 @@ public class Agent {
     @Enumerated(EnumType.STRING)
     private SupportType supportType;
 
-    @ManyToOne
-    @JoinColumn(name = "manger_id",nullable = false)
-    private Manager manager;
 
     //mapping
     @OneToMany(mappedBy = "agent")

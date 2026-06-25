@@ -30,7 +30,7 @@ public class InviteService {
 
         Invite invite = Invite.builder()
                 .invitationTo(request.sentTo())
-                .inviteToken(UUID.randomUUID())
+                .inviteToken(UUID.randomUUID().toString())
                 .supportType(request.supportType())
                 .inviteStatus(InviteStatus.PENDING)
                 .creationDate(LocalDateTime.now())
@@ -69,11 +69,16 @@ public class InviteService {
         return new GenericResponse(HttpStatus.CREATED, "invitation is ent successfully");
     }
 
-    public Boolean validate(String email, UUID token) {
+    public Invite validate(String email, String token) {
         Invite invite = inviteRepo.findByInviteToken(token);
         log.info("validating the user token ");
-        return email.equals(invite.getInvitationTo());
+        if(!email.equals(invite.getInvitationTo())) throw  new CustomException(HttpStatus.NOT_ACCEPTABLE,"invitation token is not valid");
+        return invite;
     }
 
 
+    public void updateStatus(Invite invite, InviteStatus inviteStatus) {
+        invite.setInviteStatus(inviteStatus);
+        inviteRepo.save(invite);
+    }
 }

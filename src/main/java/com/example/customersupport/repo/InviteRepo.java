@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface InviteRepo extends JpaRepository<Invite,Long> {
-    Invite findByInviteToken(UUID token);
+    Invite findByInviteToken(String token);
 }

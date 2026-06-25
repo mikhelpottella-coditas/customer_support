@@ -26,7 +26,7 @@ public class Invite {
 
     private String invitationTo;
 
-    private UUID inviteToken;
+    private String inviteToken;
 
     @Enumerated(EnumType.STRING)
     private InviteStatus inviteStatus;
