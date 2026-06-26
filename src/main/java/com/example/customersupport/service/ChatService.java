@@ -51,7 +51,7 @@ public class ChatService {
 
         chattingRepo.save(chatting);
 
-        messageTemplate.convertAndSend("topic/chat/"+complaintId,chatting);
+        messageTemplate.convertAndSend("topic/chat/",chatting.toString());
 
         return new GenericResponse(HttpStatus.OK,"sent");
 

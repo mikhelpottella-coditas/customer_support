@@ -7,10 +7,12 @@ import com.example.customersupport.dto.response.ComplaintResponseDto;
 import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.service.ComplaintService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,9 +33,9 @@ public class CustomerController {
 
 
 
-    @PostMapping("/{id}/attachment")
-    public ResponseEntity<GenericResponse> addAttachment(@PathVariable Long id,@Valid @RequestBody AttachmentRequestDto attachmentRequestDto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(complaintService.addAttachment(id,attachmentRequestDto));
+    @PostMapping("/complaint/{id}/attachment")
+    public ResponseEntity<GenericResponse> addAttachment(@PathVariable Long id, @NotNull @RequestParam MultipartFile file){
+        return ResponseEntity.status(HttpStatus.CREATED).body(complaintService.addAttachment(id,file));
     }
 
 
