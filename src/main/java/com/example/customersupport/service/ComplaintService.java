@@ -13,13 +13,13 @@ import com.example.customersupport.exception.CustomException;
 import com.example.customersupport.repo.ComplaintRepo;
 import com.example.customersupport.util.AuthorityUtil;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,12 +33,13 @@ public class ComplaintService {
 
     private final ComplaintRepo complaintRepo;
     private final CategoryService categoryService;
-    private final UserService userService;
     private final AuthorityUtil authorityUtil;
     private final CustomerService customerService;
+    private final MailService mailService;
+    private final SimpMessageSendingOperations messageTemplate;
 
 
-    public List<ComplaintResponseDto>   getAllComplaints(int page, int size, String sortBy, boolean ascending, String search, ComplaintStatus filter) {
+    public List<ComplaintResponseDto> getAllComplaints(int page, int size, String sortBy, boolean ascending, String search, ComplaintStatus filter) {
         // to check the user authority
 
         User user = authorityUtil.checkUser();
@@ -77,7 +78,7 @@ public class ComplaintService {
                 List<Long> attachemtList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList()
                         .stream().map(i -> i.getId()).toList();
 
-                Long agentId = complaint.getAgent()==null?null:complaint.getAgent().getId();
+                Long agentId = complaint.getAgent() == null ? null : complaint.getAgent().getId();
 
                 complaintResponseDtoList.add(ComplaintResponseDto.builder()
                         .id(complaint.getId())
@@ -111,7 +112,7 @@ public class ComplaintService {
         try {
             complaint = getById(id);
         } catch (Exception e) {
-            log.info("error : ",e);
+            log.info("error : ", e);
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong");
         }
 
@@ -125,7 +126,7 @@ public class ComplaintService {
 
 
         List<Long> attachmentList = complaint.getAttachmentList() == null ? null : complaint.getAttachmentList().stream().map(i -> i.getId()).toList();
-        Long agentId = complaint.getAgent()==null?null:complaint.getAgent().getId();
+        Long agentId = complaint.getAgent() == null ? null : complaint.getAgent().getId();
 
         log.info("returning the complaint by the id : {}", id);
         return new ComplaintResponseDto(complaint.getId(),
@@ -164,6 +165,9 @@ public class ComplaintService {
         } catch (Exception e) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "please check the that you provided");
         }
+        mailService.mailSender(user.getEmail(), "we are looking into your complaint ticket please wait. we will assign a agent for you complaint shortly", "new complaint is raised on" + LocalDateTime.now());
+        List<ComplaintResponseDto> complaintResponseDtoList = getAllComplaints(0, 20, "id", true, "", ComplaintStatus.RAISED);
+        messageTemplate.convertAndSend("/topic/complaints", complaintResponseDtoList);
         return new GenericResponse(HttpStatus.CREATED, "new complaint is raised successfully!!");
     }
 
@@ -250,6 +254,11 @@ public class ComplaintService {
                 throw new CustomException(HttpStatus.FORBIDDEN, "you are not allowed to access");
             complaint.setComplaintStatus(complaintStatus);
             complaintRepo.save(complaint);
+            if (complaintStatus == ComplaintStatus.RESOLVED)
+                mailService.mailSender(complaint.getCustomer().getUser().getEmail(),
+                        "thank you for being patient your issue is successfully resolved with ticket no. " + complaint.getId() +
+                                ".\n thank you for being patient,please provide the rating for our service.\n Thank you:)",
+                        "your issue is successfully resolved with ticket no. " + complaint.getId());
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -276,5 +285,9 @@ public class ComplaintService {
 
         log.info("priority is updated successfully");
         return new GenericResponse(HttpStatus.OK, "priority is updated successfully");
+    }
+
+    public SimpMessageSendingOperations getMessageTemplate() {
+        return messageTemplate;
     }
 }

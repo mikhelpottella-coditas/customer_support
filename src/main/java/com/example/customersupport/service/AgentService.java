@@ -6,28 +6,23 @@ import com.example.customersupport.dto.response.ComplaintResponseDto;
 import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.entity.Agent;
 import com.example.customersupport.entity.Complaint;
-import com.example.customersupport.entity.Invite;
 import com.example.customersupport.entity.User;
-import com.example.customersupport.enums.InviteStatus;
-import com.example.customersupport.enums.Roles;
+import com.example.customersupport.enums.ComplaintStatus;
 import com.example.customersupport.enums.SupportType;
 import com.example.customersupport.exception.CustomException;
 import com.example.customersupport.repo.AgentRepo;
-import com.example.customersupport.repo.ComplaintRepo;
-import com.example.customersupport.util.AuthorityUtil;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +31,8 @@ public class AgentService {
 
     private final AgentRepo agentRepo;
     private final ComplaintService complaintService;
+    private final MailService mailService;
+    private final SimpMessageSendingOperations messageTemplate;
 
 
     public List<AgentResponseDto> getAllAgents(int page, int size, String sortBy, boolean ascending, String search, SupportType filter) {
@@ -105,6 +102,17 @@ public class AgentService {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong!!");
         }
         log.info("the assignment of agent with  id : {} to compliant id: {} is done", agentId, complaintId);
+
+        // send email to the customer when ever the agent is assigned
+        mailService.mailSender(complaint.getCustomer().getUser().getEmail(),
+                "the agent with the email "+agent.getUser().getEmail()+
+                        " is assigned to you complaint on"+LocalDateTime.now()+"" +
+                        ".\n thank you being patient, he will connect you shortly.",
+                "Assigned an agent to the complaint with ticket no. "+complaint.getId());
+
+        // this is for web socket purpose
+        List<ComplaintResponseDto> complaintResponseDtoList = complaintService.getAllComplaints(0,20,"id", true, "", ComplaintStatus.RAISED);
+        messageTemplate.convertAndSend("/topic/complaints",complaintResponseDtoList);
         return new GenericResponse(HttpStatus.OK, "assignment successful");
     }
 
@@ -120,6 +128,15 @@ public class AgentService {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong!!");
         }
         log.info("the assignment of agent with  id : {} to compliant id: {} is done", agentId, complaintId);
+        // send email to the customer when ever the agent is reassigned
+        mailService.mailSender(complaint.getCustomer().getUser().getEmail(),
+                "the agent with the email " + agent.getUser().getEmail() +
+                        " is reassigned to you complaint on" + LocalDateTime.now() +
+                        ".\n thank you being patient, he will connect you shortly. sorry for the inconvenience",
+                "Assigned an agent to the complaint with ticket no. " + complaint.getId());
+        // this is for web socket purpose
+        List<ComplaintResponseDto> complaintResponseDtoList = complaintService.getAllComplaints(0,20,"id", true, "", ComplaintStatus.RAISED);
+        messageTemplate.convertAndSend("/topic/complaints",complaintResponseDtoList);
         return new GenericResponse(HttpStatus.OK, "assignment successful");
     }
 }
