@@ -6,9 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record AttachmentRequestDto(
 
-        @NotBlank(message = "file is blank. please provide the file")
-        String file,
-
         @NotBlank(message = "please provide the reference text")
         String referenceText
 ) {

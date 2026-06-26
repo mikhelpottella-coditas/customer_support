@@ -25,10 +25,7 @@ public record AgentRequestDto (
         @NotBlank(message = "please provide the phone number")
         @NumberFormat(style = NumberFormat.Style.NUMBER)
         @Size(min = 10,max = 10)
-        String phone,
-
-        @NotNull(message = "please your experience")
-        Double experience
+        String phone
 
 
 ){

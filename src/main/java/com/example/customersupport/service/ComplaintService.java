@@ -7,23 +7,31 @@ import com.example.customersupport.dto.response.ComplaintResponseDto;
 import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.entity.*;
 import com.example.customersupport.enums.ComplaintStatus;
+import com.example.customersupport.enums.MessageType;
 import com.example.customersupport.enums.Priority;
 import com.example.customersupport.enums.Roles;
 import com.example.customersupport.exception.CustomException;
+import com.example.customersupport.repo.AttachmentRepo;
 import com.example.customersupport.repo.ComplaintRepo;
 import com.example.customersupport.util.AuthorityUtil;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -37,6 +45,7 @@ public class ComplaintService {
     private final CustomerService customerService;
     private final MailService mailService;
     private final SimpMessageSendingOperations messageTemplate;
+    private final AttachmentRepo attachmentRepo;
 
 
     public List<ComplaintResponseDto> getAllComplaints(int page, int size, String sortBy, boolean ascending, String search, ComplaintStatus filter) {
@@ -152,16 +161,7 @@ public class ComplaintService {
                 .priority(Priority.MEDIUM)
                 .createdAt(LocalDateTime.now())
                 .build();
-
-        try {
-            List<AttachmentRequestDto> attachmentRequestDtoList = complaintRequestDto.attachmentRequestDtoList();
-            attachmentRequestDtoList.forEach(attachmentRequestDto -> {
-                Attachment attachment = Attachment.builder()
-                        .file(attachmentRequestDto.file())
-                        .referenceText(attachmentRequestDto.referenceText())
-                        .build();
-                complaint.addAttachment(attachment);
-            });
+        try{
             complaintRepo.save(complaint);
         } catch (Exception e) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "please check the that you provided");
@@ -172,7 +172,7 @@ public class ComplaintService {
         return new GenericResponse(HttpStatus.CREATED, "new complaint is raised successfully!!");
     }
 
-    public GenericResponse addAttachment(Long id, @Valid AttachmentRequestDto attachmentRequestDto) {
+    public GenericResponse addAttachment(Long id, MultipartFile multipartFile){
 
         User user = authorityUtil.checkUser();
 
@@ -181,8 +181,8 @@ public class ComplaintService {
             if (!user.getCustomer().equals(complaint.getCustomer()))
                 throw new CustomException(HttpStatus.FORBIDDEN, "you are not allowed to access");
             Attachment attachment = Attachment.builder()
-                    .referenceText(attachmentRequestDto.referenceText())
-                    .file(attachmentRequestDto.file())
+                    .referenceText("bill image reference")
+                    .file(Base64.getEncoder().encodeToString(multipartFile.getBytes()))
                     .build();
             //adding the attachment to the complaint
             complaint.addAttachment(attachment);
@@ -208,6 +208,11 @@ public class ComplaintService {
             complaint.setRating(ratingRequestDto.rating());
 
             complaintRepo.save(complaint);
+
+            Agent agent = complaint.getAgent();
+
+
+
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -258,4 +263,11 @@ public class ComplaintService {
     }
 
 
+    public ResponseEntity<byte[]> getAttachmentById(@NotNull Long attachmentId) {
+        Attachment attachment = attachmentRepo.findById(attachmentId).orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND,"the attachment is not found with the given id"));
+        byte[] imageBytes = Base64.getDecoder().decode(attachment.getFile());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+        return new ResponseEntity<>(imageBytes,headers,HttpStatus.OK);
+    }
 }

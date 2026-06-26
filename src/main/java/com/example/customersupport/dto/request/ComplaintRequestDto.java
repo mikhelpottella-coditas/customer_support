@@ -13,9 +13,6 @@ public record ComplaintRequestDto(
 
         Long category,
 
-        String description,
-
-        List<AttachmentRequestDto> attachmentRequestDtoList
-
+        String description
         ) {
 }

@@ -4,6 +4,7 @@ import com.example.customersupport.dto.response.ComplaintResponseDto;
 import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.enums.ComplaintStatus;
 import com.example.customersupport.service.ComplaintService;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,10 @@ public class ComplaintController {
 
 
 
-
+    @GetMapping("/attachment/{attachmentId}")
+    public ResponseEntity<byte[]> getAttachment(@NotNull @PathVariable Long attachmentId){
+        return complaintService.getAttachmentById(attachmentId);
+    }
 
 
 

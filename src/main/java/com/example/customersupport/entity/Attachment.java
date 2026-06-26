@@ -22,8 +22,8 @@ public class Attachment {
     private Complaint complaint;
 
 
-
-    @Column(name="file", nullable = false)
+    @Lob
+    @Column(name="file", nullable = false,columnDefinition = "MEDIUMBLOB")
     private String file;
 
 
