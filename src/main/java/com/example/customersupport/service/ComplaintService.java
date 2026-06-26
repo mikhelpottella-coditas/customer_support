@@ -154,7 +154,8 @@ public class ComplaintService {
                 .build();
 
         try {
-            complaintRequestDto.attachmentRequestDtoList().forEach(attachmentRequestDto -> {
+            List<AttachmentRequestDto> attachmentRequestDtoList = complaintRequestDto.attachmentRequestDtoList();
+            attachmentRequestDtoList.forEach(attachmentRequestDto -> {
                 Attachment attachment = Attachment.builder()
                         .file(attachmentRequestDto.file())
                         .referenceText(attachmentRequestDto.referenceText())
@@ -194,37 +195,6 @@ public class ComplaintService {
         log.info("the attachment is added to the complaint ");
         return new GenericResponse(HttpStatus.CREATED, "attachment is added to the complaint!!");
 
-    }
-
-    public GenericResponse sendMessage(Long id, String message) {
-
-        User user = authorityUtil.checkUser();
-        try {
-            Complaint complaint = complaintRepo.findById(id).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "complaint not found with the given id"));
-
-            // checking the authority of the user
-            if (user.getRole().equals(Roles.AGENT) && user.getAgent() != complaint.getAgent()) {
-                throw new CustomException(HttpStatus.FORBIDDEN, "you dont have authority");
-            }
-            if (user.getRole().equals(Roles.CUSTOMER) && user.getCustomer() != complaint.getCustomer()) {
-                throw new CustomException(HttpStatus.FORBIDDEN, "you dont have authority");
-            }
-
-            Chatting chatting = Chatting.builder()
-                    .senderId(user.getId())
-                    .message(message)
-                    .SenderName(user.getFirstName())
-                    .build();
-
-            complaint.addChatting(chatting);
-            complaintRepo.save(complaint);
-        } catch (CustomException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "something went wrong");
-        }
-        log.info("message is sent by the user id : {}", user.getId());
-        return new GenericResponse(HttpStatus.CREATED, "message sent successfully");
     }
 
 
@@ -287,7 +257,5 @@ public class ComplaintService {
         return new GenericResponse(HttpStatus.OK, "priority is updated successfully");
     }
 
-    public SimpMessageSendingOperations getMessageTemplate() {
-        return messageTemplate;
-    }
+
 }

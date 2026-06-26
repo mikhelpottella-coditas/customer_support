@@ -40,10 +40,6 @@ public class ComplaintController {
 
 
 
-    @PostMapping("/{id}/messages")
-    public ResponseEntity<GenericResponse> sendMessage(@PathVariable Long id,@RequestParam String message){
-        return ResponseEntity.status(HttpStatus.CREATED).body(complaintService.sendMessage(id,message));
-    }
 
 
 
