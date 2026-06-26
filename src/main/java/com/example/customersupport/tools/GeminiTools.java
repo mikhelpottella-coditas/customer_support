@@ -4,6 +4,7 @@ import com.example.customersupport.dto.response.ComplaintResponseDto;
 import com.example.customersupport.dto.response.GenericResponse;
 import com.example.customersupport.enums.ComplaintStatus;
 import com.example.customersupport.enums.Priority;
+import com.example.customersupport.service.ChatService;
 import com.example.customersupport.service.ComplaintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.tool.annotation.Tool;
@@ -17,6 +18,7 @@ import java.util.List;
 public class GeminiTools {
 
     private final ComplaintService complaintService;
+    private final ChatService chatService;
 
     @Tool(description = "get all the complaints under my control, and always send the data in the json format")
     public List<ComplaintResponseDto> getAllComplaints(
@@ -52,6 +54,12 @@ public class GeminiTools {
         return complaintService.setPriority(id, priority);
     }
 
+    @Tool(description = "send a message to the customer as an agent, telling them the process that we are going through to solve there problem")
+    public GenericResponse msgSender(
+            @ToolParam(description = "this id is to tell which complaint is you are trying to access. so this is an important field") Long complaintId,
+            @ToolParam(description = "this message we can take from the user or you can decide what to send you self but before sending the get the conformation from the user and proceed") String msg){
 
+        return chatService.msgSender(complaintId,msg);
+    }
 
 }

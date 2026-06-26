@@ -154,7 +154,8 @@ public class ComplaintService {
                 .build();
 
         try {
-            complaintRequestDto.attachmentRequestDtoList().forEach(attachmentRequestDto -> {
+            List<AttachmentRequestDto> attachmentRequestDtoList = complaintRequestDto.attachmentRequestDtoList();
+            attachmentRequestDtoList.forEach(attachmentRequestDto -> {
                 Attachment attachment = Attachment.builder()
                         .file(attachmentRequestDto.file())
                         .referenceText(attachmentRequestDto.referenceText())
